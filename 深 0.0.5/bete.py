@@ -1,12 +1,13 @@
 import os
 import re
-import time
+# import time
 from deepdan import *
 from tag_storage import *
 from tag_tables_creat import *
 from up_pic_tag import *
 from up_deepdan import *
 from prepare import *
+import datetime
 
 #By 魔王  （感兴趣可以加我qq：460452649）
 print('By 魔王  （感兴趣可以加我qq：460452649）')
@@ -35,8 +36,8 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
     for gallery,gallery_path in file_in.items():
         if gallery_path in file_out:
             try:
-
                 tagggs(file, gallery, gallery_path)
+                shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')
                 if os.path.isfile(f'tag/{gallery}.txt'):
                     with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
                         date = (f1.readlines())
@@ -59,14 +60,17 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
                             print(f'尝试更新 {gallery_path} 失败！\n 尝试 问题图片移动到 Problem_picture 下次启动重新识别')
                             time.sleep(3)
 
+
             except:
                 print(f'尝试更新 {gallery_path} 失败！\n')
                 time.sleep(3)
 
         else:
             try:
+                starttime = datetime.datetime.now()
                 tag(gallery, gallery_path)
                 aaaaaaa = gallery_path.replace('\\', '/')
+                shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')
                 if os.path.isfile(f'tag/{gallery}.txt'):
                     with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
                         date = (f1.readlines())
@@ -91,6 +95,8 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
                             time.sleep(3)
                         else:
                             ex.write(f'{aaaaaaa}\n')
+                endtime = datetime.datetime.now()
+                print((endtime - starttime).seconds)
 
             except:
                 print(f'尝试识别 {gallery_path} 失败！')
