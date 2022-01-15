@@ -11,14 +11,14 @@ def new_old():
             pic_old.append(old_pic.strip())
 
 
-def tagggs(full_address,gallery,gallery_path):
+def tagggs(full_address,gallery,gallery_path):#yysy这里总感觉多此一举就是了
     try:
         os.mkdir(full_address + "/" + 'temporary')
-        os.mkdir(full_address + "/" + 'temporary' + "/" + 'temporary')
+        os.mkdir(full_address + "/" + 'temporary' + "/" + 'temporary')#创建临时文件夹
     except:
         pass
 
-    for i in os.listdir(gallery_path):
+    for i in os.listdir(gallery_path):#这里是压缩新图片到临时文件夹里
         if gallery_path + '/' + i not in pic_old:
             # print(gallery_path + '/' + i)
             compressImage(gallery_path + '/' + i, full_address + "/" + 'temporary' + "/" + 'temporary' + '/' + i)
@@ -26,7 +26,7 @@ def tagggs(full_address,gallery,gallery_path):
         else:
             continue
 
-    if len(os.listdir(full_address + "/" + 'temporary' + "/" + 'temporary')) != 0 :
+    if len(os.listdir(full_address + "/" + 'temporary' + "/" + 'temporary')) != 0 :#若临时文件不为空则更新
         cccccc=full_address + "/" + 'temporary'
         print(f"\n开始更新 {gallery}\n")
         command = f'deepdanbooru evaluate {cccccc} --project-path demo --allow-folder > tag/{gallery}.txt'  # cmd模型启动命令
