@@ -38,29 +38,36 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
         if gallery_path in file_out:#判断新旧图库
             try:
                 tagggs(file, gallery, gallery_path)#新图库更新
-                shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')#备份当前图库识别（）
+
+                try:
+                    shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')#备份当前图库识别（）
+                except:
+                    pass
+
                 if os.path.isfile(f'tag/{gallery}.txt'):#判断是否有识别文件
                     with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
                         date = (f1.readlines())
-                        if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的图片会直接停止
-                            pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
+                        if len(date)==0:
+                            pass
+                        else:
+                            if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的图片会直接停止
+                                pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
 
-                            with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
-                                pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
-                                pr.close()
+                                with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
+                                    pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
+                                    pr.close()
 
-                            shutil.copyfile(pic_path, 'problem_picture/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
-                            os.remove(pic_path)
+                                shutil.copyfile(pic_path, 'problem_picture/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
+                                os.remove(pic_path)
 
-                            date.remove(date[-1])#删除识别文件内错误图片信息
-                            f1.close()
-                            with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
-                                for i in date:
-                                    f2.write(i)
-                                f2.close()
-                            print(f'尝试更新 {gallery_path} 失败！\n 尝试 问题图片移动到 Problem_picture 下次启动重新识别')
-                            time.sleep(3)
-
+                                date.remove(date[-1])#删除识别文件内错误图片信息
+                                f1.close()
+                                with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
+                                    for i in date:
+                                        f2.write(i)
+                                    f2.close()
+                                print(f'尝试更新 {gallery_path} 失败！\n 尝试 问题图片移动到 Problem_picture 下次启动重新识别')
+                                time.sleep(3)
 
             except:
                 print(f'尝试更新 {gallery_path} 失败！\n')
@@ -75,27 +82,31 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
                 if os.path.isfile(f'tag/{gallery}.txt'):#判断是否有识别文件
                     with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
                         date = (f1.readlines())
-                        if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的图片会直接停止
-                            pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
-
-                            with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
-                                pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
-                                pr.close()
-
-                            shutil.copyfile(pic_path, 'problem_picture/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
-                            os.remove(pic_path)
-
-                            date.remove(date[-1])#删除识别文件内错误图片信息
-                            f1.close()
-                            with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
-                                for i in date:
-                                    f2.write(i)
-                                f2.close()
-                            print(f'尝试识别 {gallery_path} 失败！\n尝试 问题图片移动到 Problem_picture 下次启动重新识别\n')
-                            print(f'图库 {gallery_path} 本次不列入更新\n')
-                            time.sleep(3)
+                        if len(date)==0:
+                            pass
                         else:
-                            ex.write(f'{aaaaaaa}\n')#若识别成功自动归为 更新
+                            if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的图片会直接停止
+                                pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
+
+                                with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
+                                    pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
+                                    pr.close()
+
+                                shutil.copyfile(pic_path, 'problem_picture/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
+                                os.remove(pic_path)
+
+                                date.remove(date[-1])#删除识别文件内错误图片信息
+                                f1.close()
+                                with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
+                                    for i in date:
+                                        f2.write(i)
+                                    f2.close()
+                                print(f'尝试识别 {gallery_path} 失败！\n尝试 问题图片移动到 Problem_picture 下次启动重新识别\n')
+                                print(f'图库 {gallery_path} 本次不列入更新\n')
+                                time.sleep(3)
+
+                            else:
+                                ex.write(f'{aaaaaaa}\n')#若识别成功自动归为 更新
                 # endtime = datetime.datetime.now()
                 # print((endtime - starttime).seconds)
 
