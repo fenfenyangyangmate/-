@@ -57,7 +57,12 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
                                     pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
                                     pr.close()
 
-                                shutil.copyfile(pic_path, f'problem_picture/{gallery}' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
+                                try:
+                                    os.mkdir(f'problem_picture/{gallery}')
+                                except:
+                                    pass
+
+                                shutil.copyfile(pic_path, f'problem_picture/{gallery}/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
                                 os.remove(pic_path)
 
                                 date.remove(date[-1])#删除识别文件内错误图片信息
@@ -92,7 +97,12 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
                                     pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
                                     pr.close()
 
-                                shutil.copyfile(pic_path, f'problem_picture/{gallery}' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
+                                try:
+                                    os.mkdir(f'problem_picture/{gallery}')
+                                except:
+                                    pass
+
+                                shutil.copyfile(pic_path, f'problem_picture/{gallery}/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
                                 os.remove(pic_path)
 
                                 date.remove(date[-1])#删除识别文件内错误图片信息
