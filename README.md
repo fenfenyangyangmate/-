@@ -10,7 +10,7 @@
 以后可能会弄个ui，但我技术不太行，就先凑合用吧，俺的好朋友正在努力弄ui（虽然不报太大期望就是了）
 
 #下载https://github.com/KichangKim/DeepDanbooru/releases/download/v4-20200814-sgd-e30/deepdanbooru-v4-20200814-sgd-e30.zip
-把压缩包里的文件放到demo里
+把压缩包里的文件放到demo里（不想下就直接下我的压缩包，都塞在里面了）
 首先运行cs.py(会有点久)
 结束后就可以用 查询.py 查询标签下的图片了
 
