@@ -5,9 +5,9 @@ import os, shutil,sys
 # 图片压缩批处理
 def compressImage(srcPath, dstPath):
     # for filename in os.listdir(srcPath):
-        # 如果不存在目的目录则创建一个，保持层级结构
-        if not os.path.exists("./compress"):
-            os.makedirs("./compress")
+    #     # 如果不存在目的目录则创建一个，保持层级结构
+    #     if not os.path.exists("./compress"):
+    #         os.makedirs("./compress")
 
         # # 拼接完整的文件或文件夹路径
         # srcFile = os.path.join(srcPath, filename)

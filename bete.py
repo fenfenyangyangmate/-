@@ -35,8 +35,18 @@ new_old()
 
 with open('data/existence.txt', 'a', encoding='utf-8') as ex:
     for gallery,gallery_path in file_in.items():
+        for iiiii in  os.listdir(gallery_path):
+            if '.gif' in iiiii:
+                try:
+                    os.mkdir(f'problem_picture/{gallery}')
+                except:
+                    pass
+                shutil.copyfile(gallery_path +'/'+iiiii, f'problem_picture/{gallery}/{iiiii}')  # 移动图片到 problem_picture ，初步筛选。
+                print(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
+
         if gallery_path in file_out:#判断新旧图库
             try:
+
                 tagggs(file, gallery, gallery_path)#新图库更新
 
                 try:
