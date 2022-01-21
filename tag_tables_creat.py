@@ -1,10 +1,14 @@
-import os,pymysql,re,sys
+import os,pymysql,re,sys,chardet
 
 tags=[]
 def tagg():
     print('数据库标签更新准备\n')
     for file_txt in os.listdir("tag"):
-        with open('tag'+'/'+file_txt, 'r', encoding='utf-8')as f1:
+        f = open('tag'+'/'+file_txt, 'rb')
+        r = f.read()
+        f_charInfo = chardet.detect(r)
+        f.close()
+        with open('tag'+'/'+file_txt, 'r', encoding=f_charInfo['encoding'])as f1:
             for i in f1.readlines():
                 if '(' in i:
                     a=i.strip('(')
