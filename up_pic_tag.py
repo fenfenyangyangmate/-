@@ -1,13 +1,18 @@
 import os
 import re
 import time
+import chardet
 
 
 def extract():
     filename=0
     print('开始单个图片标签提取')
     for file_tag in os.listdir('tag'):
-        with open(f'tag/{file_tag}', 'r', encoding='utf-8')as f1:
+        f = open(f'tag/{file_tag}', 'rb')
+        r = f.read()
+        f_charInfo = chardet.detect(r)
+        f.close()
+        with open(f'tag/{file_tag}', 'r', encoding=f_charInfo['encoding'])as f1:
             try:
                 os.mkdir('extract')
             except:

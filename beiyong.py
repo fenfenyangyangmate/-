@@ -52,14 +52,14 @@ except:
         f1.write('第三阶段出错！！！\n')
     input()
 
-# try:
-data()#识别导入过的图片
-write()#导入数据库
-# except:
-#     print('第四阶段出错！！！')
-#     with open('data/temporary.txt', 'a', encoding='utf-8') as f1:
-#         f1.write('第四阶段出错！！！\n')
-#     input()
+try:
+    data()#识别导入过的图片
+    write()#导入数据库
+except:
+    print('第四阶段出错！！！')
+    with open('data/temporary.txt', 'a', encoding='utf-8') as f1:
+        f1.write('第四阶段出错！！！\n')
+    input()
 
 print('数据清理开始')
 for i in os.listdir('extract'):

@@ -41,7 +41,8 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
         else:
             printRed(f'\n开始 {gallery} 识别准备\n')
             for iiiii in  os.listdir(gallery_path):
-                if '.gif' in iiiii:
+                [fffname, fffename] = os.path.splitext(iiiii)
+                if fffename not in ['.jpg','.jpeg','.png','.GIF','.JPG','.JPEG','.PNG']:
                     try:
                         os.mkdir(f'problem_picture/{gallery}')
                     except:
