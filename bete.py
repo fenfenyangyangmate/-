@@ -49,7 +49,11 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
                         pass
                     shutil.copyfile(gallery_path +'/'+iiiii, f'problem_picture/{gallery}/{iiiii}')  # 移动图片到 problem_picture ，初步筛选。
                     os.remove(gallery_path +'/'+iiiii)
-                    print(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
+                    printWhite(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
+                    with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
+                        pr.write('\n------问题图片 {} ------\n'.format(gallery_path +'/'+iiiii))  # 错误图片信息写入日志
+                        pr.close()
+                    # print(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
 
             if gallery_path in file_out:#判断新旧图库
                 try:
@@ -67,7 +71,7 @@ with open('data/existence.txt', 'a', encoding='utf-8') as ex:
                             if len(date)==0:
                                 pass
                             else:
-                                if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的图片会直接停止
+                                if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的格式会直接停止
                                     pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
 
                                     with open('data/temporary.txt', 'a', encoding='utf-8') as pr:

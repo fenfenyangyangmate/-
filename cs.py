@@ -1,7 +1,7 @@
 import os
 
 import chardet
-path='F:\\Grabber\\'
+path='F:\\美图\\'
 for a in os.listdir(path):
     for i in os.listdir(path+a):
         [fname,fename]=os.path.splitext(i)
