@@ -33,6 +33,9 @@ def preparing():
     with open('data/existence.txt', 'a', encoding='utf-8') as f1:
         f1.close()
 
+    with open('data/run_data.txt', 'a', encoding='utf-8') as f1:
+        f1.close()
+
     # try:
     #     for i in os.listdir('tag'):
     #         os.remove('tag' + "/" + i)

@@ -20,18 +20,27 @@ preparing() #删除多余文件，检查必要文件夹是否创建
 
 print('准备结束！')
 
-if len(os.listdir('tag')) == 0:
+if len(os.listdir('tag')) == 0: #判断上次启动是否完成
+    with open('data/run_data.txt', 'r', encoding='utf-8') as rd:
+        rundata=rd.readlines()
+        rd.close()
+        # if len(rundata) != 0:
+
     file_in={}#输入路径下的图库路径和图库名
     file_out=[]#导入过的图库
     file=(input('输入要识别的文件夹:')).replace('\\','/')
 
     try:
-        os.remove(file+'/temporary/temporary')
+        os.removedirs(file+'/temporary/temporary')
     except:
         pass
-
-    for file_name in os.listdir(file): #获取图库地址
-        file_in.update({file_name:file + '/' + file_name})
+    with open('data/run_data.txt', 'a', encoding='utf-8') as rd:
+        rd.write(f'{file}\n')
+        for file_name in os.listdir(file): #获取图库地址
+            ppath=file + '/' + file_name
+            file_in.update({file_name:ppath})
+            rd.write(f'{ppath}\n')
+        rd.close()
 
     with open('data/existence.txt', 'r', encoding='utf-8') as ex: #获取已导入图库信息
         for im in ex.readlines():
@@ -44,6 +53,8 @@ if len(os.listdir('tag')) == 0:
         for gallery,gallery_path in file_in.items():
             if ' ' in gallery:                                      #图库名里不能有空格！！！
                 printGreen(f'\n图库 ： {gallery} 有空格无法识别！！！\n')
+            if 'temporary' in gallery:
+                pass
             else:
                 printRed(f'\n开始 {gallery} 识别准备\n')
                 for iiiii in  os.listdir(gallery_path):
@@ -150,6 +161,21 @@ if len(os.listdir('tag')) == 0:
                     except:
                         print(f'尝试识别 {gallery_path} 失败！')
                         time.sleep(3)
+            with open('data/run_data.txt', 'r', encoding='utf-8') as rd:
+                ddata=rd.readlines()
+                rd.close()
+                ddata.remove(f'{gallery_path}\n')
+                with open('data/run_data.txt', 'w', encoding='utf-8') as rd:
+                    for i in ddata:
+                        rd.write(i)
+                rd.close()
+
+    try:  # 删除更新的临时文件夹
+        for i in os.listdir(file + "/" + 'temporary' + "/" + 'temporary'):
+            os.remove(file + "/" + 'temporary' + "/" + 'temporary' + '/' + i)
+        os.removedirs(file + "/" + 'temporary' + "/" + 'temporary')
+    except:
+        pass
 
 
     print('\n识别结束')
@@ -157,8 +183,16 @@ if len(os.listdir('tag')) == 0:
 
     ex.close()
 
-else:
-    pass
+# else:
+#     pass
+
+for i in os.listdir('tag'):
+    size=os.path.getsize('tag/'+i)
+    if size==0:
+        os.remove('tag/'+i)
+
+with open('data/run_data.txt', 'w', encoding='utf-8') as rd:
+    rd.close()
 
 try:
     tagg()#数据库标签更新
@@ -193,13 +227,6 @@ for i in os.listdir('extract'):#删除提取后的信息（每次启动也会进
 
 for i in os.listdir('tag'):#删除识别信息（每次启动也会进行）
     os.remove('tag'+'/'+i)
-
-try:#删除更新的临时文件夹（每次启动也会进行）
-    for i in os.listdir(file + "/" + 'temporary' + "/" + 'temporary'):
-        os.remove(file + "/" + 'temporary' + "/" + 'temporary' + '/' + i)
-    os.removedirs(file + "/" + 'temporary' + "/" + 'temporary')
-except:
-    pass
 
 # print('本次导入结束！')
 printRed(u'本次导入结束！\n')

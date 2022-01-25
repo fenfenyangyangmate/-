@@ -1,4 +1,5 @@
 import os,pymysql,re,sys,chardet
+from color import *
 
 tags=[]
 def tagg():
@@ -11,23 +12,26 @@ def tagg():
         with open('tag'+'/'+file_txt, 'r', encoding=f_charInfo['encoding'])as f1:
             for i in f1.readlines():
                 if '(' in i:
-                    a=i.strip('(')
-                    b=a.replace(')','',1)
-                    p1 = re.compile(r'[\(](.*)[\)]', re.S)
-                    for c in re.findall(p1, i):
-                        d=b.strip(c+' ')
-                        e=d.strip('\n')
-                        if 'rating:' in e:
-                            f=e.replace('rating:','')
-                            if f in tags:
-                                continue
+                    if 'Tags of' in i:
+                        continue
+                    else:
+                        a=i.strip('(')
+                        b=a.replace(')','',1)
+                        p1 = re.compile(r'[\(](.*)[\)]', re.S)
+                        for c in re.findall(p1, i):
+                            d=b.strip(c+' ')
+                            e=d.strip('\n')
+                            if 'rating:' in e:
+                                f=e.replace('rating:','')
+                                if f in tags:
+                                    continue
+                                else:
+                                    tags.append(f.replace('-','_'))
                             else:
-                                tags.append(f.replace('-','_'))
-                        else:
-                            if e in tags:
-                                continue
-                            else:
-                                tags.append((e.replace('-','_')).strip('‘'))
+                                if e in tags:
+                                    continue
+                                else:
+                                    tags.append((e.replace('-','_')).strip('‘'))
     print('数据库标签更新开始')
     print('*'*30)
 
@@ -56,6 +60,8 @@ def creat():
         try:
             if i in table_list:
                 continue
+            elif 'Tags of ' in i:
+                continue
             else:
                 db = pymysql.connect(host='localhost',
                                      user='root',
@@ -66,9 +72,9 @@ def creat():
                 sql = f'CREATE TABLE {i} (FIRST_NAME  CHAR(200) NOT NULL )'
                 cursor.execute(sql)
                 db.close()
-                sys.stdout.write('\r创建新标签{}!!!'.format(i))
+                printYellow(u'创建新标签{}!!!\n'.format(i))
         except:
-            sys.stdout.write('\r该标签无法创建（没影响）："""{}"""'.format(i))
+            printWhite(u'该标签无法创建（没影响）："""{}"""\n'.format(i))
             pass
     print('数据库标签更新结束')
     print('*' * 30)
