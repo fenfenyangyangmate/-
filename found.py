@@ -1,5 +1,5 @@
+import re
 import time
-
 import pymysql,sys,random,os
 from PIL import Image
 
@@ -7,14 +7,19 @@ from PIL import Image
 print('By 魔王  （感兴趣可以加我qq：460452649）')
 
 aaa=[]
+
 def found(tags,times):
+    cursor = db.cursor()
+    sql = "show tables"
+    cursor.execute(sql)
+    table = cursor.fetchall()
+    table_list = re.findall('(\'.*?\')', str(table))
+    table_list = [re.sub("'", '', each) for each in table_list]
 
     if times=='':
         times=1
-
-    # 使用cursor()方法获取操作游标
-    cursor = db.cursor()
     # SQL 查询语句
+    tags =((tags.replace('(', '（')).replace(')', '）')).replace('/','$')
     sql = f"SELECT * FROM {tags}"
     try:
         # 执行SQL语句
@@ -29,7 +34,10 @@ def found(tags,times):
     except:
         print("Error: unable to fetch data")
     if len(aaa)==0:
-        wu='无该标签或标签输入不正确（参考tag.txt）'
+        if tags in table_list:
+            wu = '标签下图片为 0'
+        else:
+            wu='无该标签或标签输入不正确（参考tag.txt）'
         print(wu)
         f1.write(f'{wu} \n')
         # f1.write('{}\n'.format('*' * 20))
@@ -59,9 +67,14 @@ def found(tags,times):
     aaa.clear()
 
 def found1(tags):
-    # 使用cursor()方法获取操作游标
     cursor = db.cursor()
-    # SQL 查询语句
+    sql = "show tables"
+    cursor.execute(sql)
+    table = cursor.fetchall()
+    table_list = re.findall('(\'.*?\')', str(table))
+    table_list = [re.sub("'", '', each) for each in table_list]
+
+    tags=((tags.replace('(', '（')).replace(')', '）')).replace('/','$')
     sql = f"SELECT * FROM {tags}"
     try:
         # 执行SQL语句
@@ -75,7 +88,10 @@ def found1(tags):
     except:
         print("Error: unable to fetch data")
     if len(aaa)==0:
-        wu='无该标签或标签输入不正确（参考tag.txt）'
+        if tags in table_list:
+            wu = '标签下图片为 0'
+        else:
+            wu = '无该标签或标签输入不正确（参考tag.txt）'
         print(wu)
         f1.write(f'{wu} \n')
         # f1.write('{}\n'.format('*' * 20))

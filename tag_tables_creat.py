@@ -11,27 +11,26 @@ def tagg():
         f.close()
         with open('tag'+'/'+file_txt, 'r', encoding=f_charInfo['encoding'])as f1:
             for i in f1.readlines():
-                if '(' in i:
-                    if 'Tags of' in i:
-                        continue
+                a = i.strip()
+                if 'Tags of' in a:
+                    continue
+                elif a == '':
+                    continue
+                else:
+                    p1 = re.compile(r'[\(](.*?)[\)]', re.S)
+                    b = a.replace((re.findall(p1, a))[0], '')
+                    c = b.replace('() ', '')
+                    if 'rating:' in c:
+                        f=c.replace('rating:','')
+                        if f in tags:
+                            continue
+                        else:
+                            tags.append(f.replace('-','_'))
                     else:
-                        a=i.strip('(')
-                        b=a.replace(')','',1)
-                        p1 = re.compile(r'[\(](.*)[\)]', re.S)
-                        for c in re.findall(p1, i):
-                            d=b.strip(c+' ')
-                            e=d.strip('\n')
-                            if 'rating:' in e:
-                                f=e.replace('rating:','')
-                                if f in tags:
-                                    continue
-                                else:
-                                    tags.append(f.replace('-','_'))
-                            else:
-                                if e in tags:
-                                    continue
-                                else:
-                                    tags.append((e.replace('-','_')).strip('‘'))
+                        if c in tags:
+                            continue
+                        else:
+                            tags.append((c.replace('-','_')).strip('‘'))
     print('数据库标签更新开始')
     print('*'*30)
 
@@ -57,10 +56,10 @@ def creat():
     table_list = [re.sub("'", '', each) for each in table_list]
 
     for i in tags:
+        i = (i.replace('(', '（')).replace(')', '）')
+        i=i.replace('/','$')
         try:
             if i in table_list:
-                continue
-            elif 'Tags of ' in i:
                 continue
             else:
                 db = pymysql.connect(host='localhost',
@@ -68,9 +67,9 @@ def creat():
                                      password='123456',
                                      database='tag')  #这里一定要改
                 cursor = db.cursor()
-                cursor.execute("DROP TABLE IF EXISTS EMPLOYEE")
-                sql = f'CREATE TABLE {i} (FIRST_NAME  CHAR(200) NOT NULL )'
-                cursor.execute(sql)
+                # cursor.execute("DROP TABLE IF EXISTS EMPLOYEE")
+                # sql = f'CREATE TABLE {i} (FIRST_NAME  CHAR(200) NOT NULL )'
+                cursor.execute("CREATE TABLE %s (FIRST_NAME  CHAR(200) NOT NULL )"%(i))
                 db.close()
                 printYellow(u'创建新标签{}!!!\n'.format(i))
         except:
@@ -80,4 +79,7 @@ def creat():
     print('*' * 30)
 if __name__ == '__main__':
     tagg()
+    # for i in tags:
+    #     if 'xuanzang' in i:
+    #         print(i)
     creat()

@@ -20,168 +20,172 @@ preparing() #删除多余文件，检查必要文件夹是否创建
 
 print('准备结束！')
 
-if len(os.listdir('tag')) == 0: #判断上次启动是否完成
-    with open('data/run_data.txt', 'r', encoding='utf-8') as rd:
-        rundata=rd.readlines()
-        rd.close()
-        # if len(rundata) != 0:
 
-    file_in={}#输入路径下的图库路径和图库名
-    file_out=[]#导入过的图库
-    file=(input('输入要识别的文件夹:')).replace('\\','/')
-
-    try:
-        os.removedirs(file+'/temporary/temporary')
-    except:
-        pass
-    with open('data/run_data.txt', 'a', encoding='utf-8') as rd:
+with open('data/run_data.txt', 'r', encoding='utf-8') as rd:
+    rundata = rd.readlines()
+    if len(rundata) != 0:
+        print('检测到上次启动未完成，断点开始')
+        file = (rundata[0]).strip()
+        rundata.remove(rundata[0])
+        print(rundata)
+    else:
+        file=(input('输入要识别的文件夹:')).replace('\\','/')
         rd.write(f'{file}\n')
-        for file_name in os.listdir(file): #获取图库地址
-            ppath=file + '/' + file_name
-            file_in.update({file_name:ppath})
-            rd.write(f'{ppath}\n')
-        rd.close()
+    rd.close()
 
-    with open('data/existence.txt', 'r', encoding='utf-8') as ex: #获取已导入图库信息
-        for im in ex.readlines():
-            file_out.append(im.strip())
-        ex.close()
-
-    new_old()
-
-    with open('data/existence.txt', 'a', encoding='utf-8') as ex:
-        for gallery,gallery_path in file_in.items():
-            if ' ' in gallery:                                      #图库名里不能有空格！！！
-                printGreen(f'\n图库 ： {gallery} 有空格无法识别！！！\n')
-            if 'temporary' in gallery:
-                pass
-            else:
-                printRed(f'\n开始 {gallery} 识别准备\n')
-                for iiiii in  os.listdir(gallery_path):
-                    [fffname, fffename] = os.path.splitext(iiiii)
-                    if fffename not in ['.jpg','.jpeg','.png','.GIF','.JPG','.JPEG','.PNG']:
-                        try:
-                            os.mkdir(f'problem_picture/{gallery}')
-                        except:
-                            pass
-                        shutil.copyfile(gallery_path +'/'+iiiii, f'problem_picture/{gallery}/{iiiii}')  # 移动图片到 problem_picture ，初步筛选。
-                        os.remove(gallery_path +'/'+iiiii)
-                        printWhite(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
-                        with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
-                            pr.write('\n------问题图片 {} ------\n'.format(gallery_path +'/'+iiiii))  # 错误图片信息写入日志
-                            pr.close()
-                        # print(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
-
-                if gallery_path in file_out:#判断新旧图库
-                    try:
-
-                        tagggs(file, gallery, gallery_path)#新图库更新
-
-                        try:
-                            shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')#备份当前图库识别（）
-                        except:
-                            pass
-
-                        if os.path.isfile(f'tag/{gallery}.txt'):#判断是否有识别文件
-                            with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
-                                date = (f1.readlines())
-                                if len(date)==0:
-                                    pass
-                                else:
-                                    if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的格式会直接停止
-                                        pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
-
-                                        with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
-                                            pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
-                                            pr.close()
-
-                                        try:
-                                            os.mkdir(f'problem_picture/{gallery}')
-                                        except:
-                                            pass
-
-                                        shutil.copyfile(pic_path, f'problem_picture/{gallery}/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
-                                        os.remove(pic_path)
-
-                                        date.remove(date[-1])#删除识别文件内错误图片信息
-                                        f1.close()
-                                        with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
-                                            for i in date:
-                                                f2.write(i)
-                                            f2.close()
-                                        print(f'尝试更新 {gallery_path} 失败！\n 尝试 问题图片移动到 Problem_picture 下次启动重新识别')
-                                        time.sleep(3)
-
-                    except:
-                        print(f'尝试更新 {gallery_path} 失败！\n')
-                        time.sleep(3)
-
-                else:
-                    try:
-                        # starttime = datetime.datetime.now()
-                        tag(gallery, gallery_path)#新图库识别
-                        aaaaaaa = gallery_path.replace('\\', '/')
-                        shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')#备份当前图库识别（）
-                        if os.path.isfile(f'tag/{gallery}.txt'):#判断是否有识别文件
-                            with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
-                                date = (f1.readlines())
-                                if len(date)==0:
-                                    pass
-                                else:
-                                    if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的图片会直接停止
-                                        pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
-
-                                        with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
-                                            pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
-                                            pr.close()
-
-                                        try:
-                                            os.mkdir(f'problem_picture/{gallery}')
-                                        except:
-                                            pass
-
-                                        shutil.copyfile(pic_path, f'problem_picture/{gallery}/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
-                                        os.remove(pic_path)
-
-                                        date.remove(date[-1])#删除识别文件内错误图片信息
-                                        f1.close()
-                                        with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
-                                            for i in date:
-                                                f2.write(i)
-                                            f2.close()
-                                        print(f'尝试识别 {gallery_path} 失败！\n尝试 问题图片移动到 Problem_picture 下次启动重新识别\n')
-                                        print(f'图库 {gallery_path} 本次不列入更新\n')
-                                        time.sleep(3)
-
-                                    else:
-                                        ex.write(f'{aaaaaaa}\n')#若识别成功自动归为 更新
-                        # endtime = datetime.datetime.now()
-                        # print((endtime - starttime).seconds)
-
-                    except:
-                        print(f'尝试识别 {gallery_path} 失败！')
-                        time.sleep(3)
-            with open('data/run_data.txt', 'r', encoding='utf-8') as rd:
-                ddata=rd.readlines()
-                rd.close()
-                ddata.remove(f'{gallery_path}\n')
-                with open('data/run_data.txt', 'w', encoding='utf-8') as rd:
-                    for i in ddata:
-                        rd.write(i)
-                rd.close()
-
-    try:  # 删除更新的临时文件夹
-        for i in os.listdir(file + "/" + 'temporary' + "/" + 'temporary'):
-            os.remove(file + "/" + 'temporary' + "/" + 'temporary' + '/' + i)
-        os.removedirs(file + "/" + 'temporary' + "/" + 'temporary')
-    except:
-        pass
+file_in={}#输入路径下的图库路径和图库名
+file_out=[]#导入过的图库
 
 
-    print('\n识别结束')
-    print('*'*30)
+try:
+    os.removedirs(file+'/temporary/temporary')
+except:
+    pass
 
+for file_name in os.listdir(file): #获取图库地址
+    ppath=file + '/' + file_name
+    file_in.update({file_name:ppath})
+
+
+
+with open('data/existence.txt', 'r', encoding='utf-8') as ex: #获取已导入图库信息
+    for im in ex.readlines():
+        file_out.append(im.strip())
     ex.close()
+
+new_old()
+
+with open('data/existence.txt', 'a', encoding='utf-8') as ex:
+    for gallery,gallery_path in file_in.items():
+        if ' ' in gallery:                                      #图库名里不能有空格！！！
+            printGreen(f'\n图库 ： {gallery} 有空格无法识别！！！\n')
+        elif 'temporary' in gallery:
+            pass
+        elif gallery_path in rundata and os.path.isfile('tag/'+gallery+'.txt'):
+            printWhiteBlack(f'上一次启动已识别{gallery_path}\n')
+        else:
+            printRed(f'\n开始 {gallery} 识别准备\n')
+            for iiiii in  os.listdir(gallery_path):
+                [fffname, fffename] = os.path.splitext(iiiii)
+                if fffename not in ['.jpg','.jpeg','.png','.GIF','.JPG','.JPEG','.PNG']:
+                    try:
+                        os.mkdir(f'problem_picture/{gallery}')
+                    except:
+                        pass
+                    shutil.copyfile(gallery_path +'/'+iiiii, f'problem_picture/{gallery}/{iiiii}')  # 移动图片到 problem_picture ，初步筛选。
+                    os.remove(gallery_path +'/'+iiiii)
+                    printWhite(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
+                    with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
+                        pr.write('\n------问题图片 {} ------\n'.format(gallery_path +'/'+iiiii))  # 错误图片信息写入日志
+                        pr.close()
+                    # print(f'发现错误文件 {gallery}/{iiiii} ，移动到 Problem_picture \n')
+
+            if gallery_path in file_out:#判断新旧图库
+                try:
+
+                    tagggs(file, gallery, gallery_path)#新图库更新
+
+                    try:
+                        shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')#备份当前图库识别（）
+                    except:
+                        pass
+
+                    if os.path.isfile(f'tag/{gallery}.txt'):#判断是否有识别文件
+                        with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
+                            date = (f1.readlines())
+                            if len(date)==0:
+                                pass
+                            else:
+                                if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的格式会直接停止
+                                    pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
+
+                                    with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
+                                        pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
+                                        pr.close()
+
+                                    try:
+                                        os.mkdir(f'problem_picture/{gallery}')
+                                    except:
+                                        pass
+
+                                    shutil.copyfile(pic_path, f'problem_picture/{gallery}/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
+                                    os.remove(pic_path)
+
+                                    date.remove(date[-1])#删除识别文件内错误图片信息
+                                    f1.close()
+                                    with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
+                                        for i in date:
+                                            f2.write(i)
+                                        f2.close()
+                                    print(f'尝试更新 {gallery_path} 失败！\n 尝试 问题图片移动到 Problem_picture 下次启动重新识别')
+                                    time.sleep(3)
+
+                except:
+                    print(f'尝试更新 {gallery_path} 失败！\n')
+                    time.sleep(3)
+
+            else:
+                try:
+                    # starttime = datetime.datetime.now()
+                    tag(gallery, gallery_path)#新图库识别
+                    aaaaaaa = gallery_path.replace('\\', '/')
+                    shutil.copyfile(f'tag/{gallery}.txt', f'backup/{gallery}.txt')#备份当前图库识别（）
+                    if os.path.isfile(f'tag/{gallery}.txt'):#判断是否有识别文件
+                        with open(f'tag/{gallery}.txt', 'r', encoding='utf-8') as f1:
+                            date = (f1.readlines())
+                            if len(date)==0:
+                                pass
+                            else:
+                                if 'Tags of ' in date[-1]:#判断是否识别成功，模型遇到无法识别的图片会直接停止
+                                    pic_path = (((date[-1]).strip()).replace('Tags of ', '')).strip(':')#获取错误图片地址
+
+                                    with open('data/temporary.txt', 'a', encoding='utf-8') as pr:
+                                        pr.write('\n------问题图片 {} ------\n'.format(pic_path))#错误图片信息写入日志
+                                        pr.close()
+
+                                    try:
+                                        os.mkdir(f'problem_picture/{gallery}')
+                                    except:
+                                        pass
+
+                                    shutil.copyfile(pic_path, f'problem_picture/{gallery}/' + os.path.basename(pic_path))#移动图片到 problem_picture ，防止下次识别继续出错
+                                    os.remove(pic_path)
+
+                                    date.remove(date[-1])#删除识别文件内错误图片信息
+                                    f1.close()
+                                    with open(f'tag/{gallery}.txt', 'w', encoding='utf-8') as f2:
+                                        for i in date:
+                                            f2.write(i)
+                                        f2.close()
+                                    print(f'尝试识别 {gallery_path} 失败！\n尝试 问题图片移动到 Problem_picture 下次启动重新识别\n')
+                                    print(f'图库 {gallery_path} 本次不列入更新\n')
+                                    time.sleep(3)
+
+                                else:
+                                    ex.write(f'{aaaaaaa}\n')#若识别成功自动归为 更新
+                    # endtime = datetime.datetime.now()
+                    # print((endtime - starttime).seconds)
+
+                except:
+                    print(f'尝试识别 {gallery_path} 失败！')
+                    time.sleep(3)
+        if len(rundata) == 0:
+            with open('data/run_data.txt', 'a', encoding='utf-8') as rd:
+                rd.write(f'{gallery_path}\n')
+                rd.close()
+
+try:  # 删除更新的临时文件夹
+    for i in os.listdir(file + "/" + 'temporary' + "/" + 'temporary'):
+        os.remove(file + "/" + 'temporary' + "/" + 'temporary' + '/' + i)
+    os.removedirs(file + "/" + 'temporary' + "/" + 'temporary')
+except:
+    pass
+
+
+print('\n识别结束')
+print('*'*30)
+
+ex.close()
 
 # else:
 #     pass
@@ -211,6 +215,9 @@ except:
         f1.write('第三阶段出错！！！\n')
     input()
 
+with open('data/run_data.txt', 'w', encoding='utf-8') as rb:
+    rb.close()
+
 try:
     data()#识别导入过的图片
     write()#导入数据库
@@ -219,6 +226,8 @@ except:
     with open('data/temporary.txt', 'a', encoding='utf-8') as f1:
         f1.write('第四阶段出错！！！\n')
     input()
+
+
 
 print('数据清理开始')
 
