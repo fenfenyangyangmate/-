@@ -1,33 +1,13 @@
-import re
+import os
 import time
-import pymysql,sys,random,os
-from PIL import Image
-
-#By 魔王  （感兴趣可以加我qq：460452649）
-print('By 魔王  （感兴趣可以加我qq：460452649）')
-
-
-def writing(tag):
-    tag = ((tag.replace('(', '（')).replace(')', '）')).replace('/', '$')
-    aaa = 'F:/Grabber/gonoike_biwa/2000077.jpg'
-    db = pymysql.connect(host='localhost',
-                         user='root',
-                         password='123456',
-                         database='tag')
-    cursor = db.cursor()
-    # SQL 插入语句
-    sql = f"INSERT INTO {tag} (FIRST_NAME) VALUES ('" + aaa + "')"
-    try:
-        # 执行sql语句
-        cursor.execute(sql)
-        # 提交到数据库执行
-        db.commit()
-        print('cg')
-    except:
-        # 如果发生错误则回滚
-
-        db.rollback()
-        pass
-    db.close()
-if __name__ == '__main__':
-    writing('xuanzang_(fate/grand_order)')
+from time import sleep
+from tqdm import tqdm
+# 这里同样的，tqdm就是这个进度条最常用的一个方法
+# 里面存一个可迭代对象
+for i in tqdm(os.listdir('tag')):
+  time.sleep(0.5)
+  a=0
+  # print(1)
+  # 模拟你的任务
+  # sleep(0.01)
+# sleep(0.5)
