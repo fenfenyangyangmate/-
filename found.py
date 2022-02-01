@@ -156,7 +156,8 @@ def found1(tag):
             if len(aaa) != 0:
                 pic_x = set(aaa) & set(bbb)
                 if len(pic_x) == 0:
-                    printYellow('未发现符合标签的图片，尝试减少标签数量！')
+                    printYellow('未发现符合的图片，尝试减少标签数量！\n\n')
+                    bbb.clear()
                     break
                 else:
                     bbb.clear()
@@ -165,15 +166,16 @@ def found1(tag):
             else:
                 pass
             aaa.clear()
-
-        if len(bbb) != 0:
+        if len(bbb) == 0:
+            pass
+        else:
             printBlue(f'\n查询到 {len(bbb)} 张 \n\n')
             f1.write('\n')
             for i in bbb:
                 f1.write(f'{i}\n')
 
 
-        f1.close()
+            f1.close()
 
 def overlapping(tag,tt):
     global pic_x, results
@@ -225,7 +227,8 @@ def overlapping(tag,tt):
             if len(aaa)!=0:
                 pic_x = set(aaa) & set(bbb)
                 if len(pic_x) == 0:
-                    printYellow('未发现符合标签的图片，尝试减少标签数量！')
+                    printYellow('未发现符合的图片，尝试减少标签数量！\n\n')
+                    bbb.clear()
                     break
                 else:
                     bbb.clear()
@@ -234,31 +237,35 @@ def overlapping(tag,tt):
             else:
                 pass
             aaa.clear()
-        if tt == '':
-            times=1
+        if len(bbb)==0:
+            pass
         else:
-            tt=int(tt)
-            if tt > len(bbb):
-                times=len(bbb)
-                print(f'超出范围，只显示 {len(bbb)} 张！')
-                f1.write(f'显示 : {len(bbb)} 张\n')
+            printGreen(f'符合条件 ： {len(bbb)} 张\n')
+            if tt == '':
+                times=1
             else:
-                times=tt
-                f1.write(f'显示 : {tt} 张\n')
-                print(f'显示 : {tt} 张\n')
-        for i in range(0,int(times)):
+                tt=int(tt)
+                if tt > len(bbb):
+                    times=len(bbb)
+                    print(f'超出范围，只显示 {len(bbb)} 张！')
+                    f1.write(f'显示 : {len(bbb)} 张\n')
+                else:
+                    times=tt
+                    f1.write(f'显示 : {tt} 张\n')
+                    print(f'显示 : {tt} 张\n')
+            for i in range(0,int(times)):
 
-            try:
-                timess = random.choice(bbb)
-                bbb.remove(timess)
-                img = Image.open(timess)
-                f1.write(f"{timess} \n")
-                img.show()
-            except:
-                print('出错了！！！,图片移动了或数量不符合格式')
-                f1.write(f"↑ 报错图片 \n")
+                try:
+                    timess = random.choice(bbb)
+                    bbb.remove(timess)
+                    img = Image.open(timess)
+                    f1.write(f"{timess} \n")
+                    img.show()
+                except:
+                    print('出错了！！！,图片移动了或数量不符合格式')
+                    f1.write(f"↑ 报错图片 \n")
 
-        f1.close()
+            f1.close()
 
     # print(bbb)
 
@@ -272,36 +279,36 @@ if __name__ == '__main__':
         ccc=input('请选择模式，回车默认打开图片，任意输入只查询（查询结果在data/temporary.txt)：')
         if ccc != '':
             bbbb=[]
-            while len(number) != 0:
-                db = pymysql.connect(host='localhost',
-                                     user='root',
-                                     password='123456',
-                                     database='tag')      #这里一定要改
-                with open('data/temporary.txt', 'a', encoding='utf-8')as f1:
-                    f1.write('{}\n'.format('*' * 20))
-                    f1.write("{}\n".format(time.ctime()))
-                    f1.write('--查询模式--\n')
-                    f1.write('查询标签：\n\n')
-                    print('♾' * 30)
-                    print('回车输入多个标签--交叉搜索，空白回车返回上一级')
-                    ts = 1
-                    while ts != 3:
-                        t = input('请输入关键词：')
-                        if t != '':
-                            if t not in bbbb:
-                                bbbb.append(t)
-                                f1.write(f'{t}\n')
-                            else:
-                                printYellow(f'\n标签 {t} 已输入，请勿重复输入！\n\n')
+
+            db = pymysql.connect(host='localhost',
+                                 user='root',
+                                 password='123456',
+                                 database='tag')      #这里一定要改
+            with open('data/temporary.txt', 'a', encoding='utf-8')as f1:
+                f1.write('{}\n'.format('*' * 20))
+                f1.write("{}\n".format(time.ctime()))
+                f1.write('--查询模式--\n')
+                f1.write('查询标签：\n\n')
+                print('♾' * 30)
+                print('回车输入多个标签--交叉搜索，空白回车返回上一级')
+                ts = 1
+                while ts != 3:
+                    t = input('请输入关键词：')
+                    if t != '':
+                        if t not in bbbb:
+                            bbbb.append(t)
+                            f1.write(f'{t}\n')
                         else:
-                            if len(bbbb) == 0:
-                                printYellow('\n第一次不能输入空值，请重新输入！\n\n')
-                                ts = 3
-                            else:
-                                found1(bbbb)
-                                print('\n查询结束\n')
-                                print('♾' * 30)
-                                ts = 3
+                            printYellow(f'\n标签 {t} 已输入，请勿重复输入！\n\n')
+                    else:
+                        if len(bbbb) == 0:
+                            printYellow('\n第一次不能输入空值，请重新输入！\n\n')
+                            ts = 3
+                        else:
+                            found1(bbbb)
+                            print('\n查询结束\n')
+                            print('♾' * 30)
+                            ts = 3
 
         else:
             bbbb=[]

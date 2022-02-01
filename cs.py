@@ -45,3 +45,33 @@ if __name__ == '__main__':
   # for i in (set(a) & (set(b))):
   #   c.append(i)
   #   print(i)
+
+  if len(bbb) == 0:
+    pass
+  else:
+    printGreen(f'符合条件 ： {len(bbb)} 张\n')
+    if tt == '':
+      times = 1
+    else:
+      tt = int(tt)
+      if tt > len(bbb):
+        times = len(bbb)
+        print(f'超出范围，只显示 {len(bbb)} 张！')
+        f1.write(f'显示 : {len(bbb)} 张\n')
+      else:
+        times = tt
+        f1.write(f'显示 : {tt} 张\n')
+        print(f'显示 : {tt} 张\n')
+    for i in range(0, int(times)):
+
+      try:
+        timess = random.choice(bbb)
+        bbb.remove(timess)
+        img = Image.open(timess)
+        f1.write(f"{timess} \n")
+        img.show()
+      except:
+        print('出错了！！！,图片移动了或数量不符合格式')
+        f1.write(f"↑ 报错图片 \n")
+
+    f1.close()
