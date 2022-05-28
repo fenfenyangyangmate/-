@@ -2,6 +2,7 @@ import re
 import sys
 import os
 import time
+import  shutil
 import pymysql
 from color import *
 from deepdanbooru import commands
@@ -21,33 +22,53 @@ print('PS: 不能用 temporary 的图库')
 old_gallery=[]
 tag_sum={}
 # table_list=[]
-def prepare_gallery_on():#获取导入过的图库
+# def prepare_gallery_on():#获取导入过的图库
+#     sql = f"select * from gallery_on"
+#     cursor.execute(sql)
+#     table = cursor.fetchall()
+#     old_gallery = re.findall('(\'.*?\')', str(table))
+#     old_gallery = [re.sub("'", '', each) for each in old_gallery]
+#     return old_gallery
+#
+# def prepare_tag():#获取创建过的标签
+#     sql = "show tables"
+#     cursor.execute(sql)
+#     table = cursor.fetchall()
+#     table_list = re.findall('(\'.*?\')', str(table))
+#     table_list = [re.sub("'", '', each) for each in table_list]
+#     return table_list
+#
+# def prepare_all_pic():
+#     sql = f"select * from all_pic"
+#     cursor.execute(sql)
+#     table = cursor.fetchall()
+#     old_pic = re.findall('(\'.*?\')', str(table))
+#     old_pic = [re.sub("'", '', each) for each in old_pic]
+#     return old_pic
+
+
+def gallery(project):
+    #获取导入过的图库
     sql = f"select * from gallery_on"
     cursor.execute(sql)
     table = cursor.fetchall()
     old_gallery = re.findall('(\'.*?\')', str(table))
     old_gallery = [re.sub("'", '', each) for each in old_gallery]
-    return old_gallery
 
-def prepare_tag():#获取创建过的标签
+    # 获取创建过的标签
     sql = "show tables"
     cursor.execute(sql)
     table = cursor.fetchall()
     table_list = re.findall('(\'.*?\')', str(table))
     table_list = [re.sub("'", '', each) for each in table_list]
-    return table_list
 
-def prepare_all_pic():
+    # 获取导入过的图片
     sql = f"select * from all_pic"
     cursor.execute(sql)
     table = cursor.fetchall()
     old_pic = re.findall('(\'.*?\')', str(table))
     old_pic = [re.sub("'", '', each) for each in old_pic]
-    return old_pic
 
-
-def gallery(project):
-    tag_data = []
     fi=0
     for gal in os.listdir(project):
         fi+=1
@@ -61,14 +82,14 @@ def gallery(project):
                 os.remove(temporary + '/' + file)
             os.removedirs(temporary)
 
-        if gallery_path in prepare_gallery_on():
+        if gallery_path in old_gallery:
             print(f'\n ********** 判断图库 {gal} 是否需要更新 ！**********\n')
             gallery_path=gallery_path.replace('/','\\')
             os.makedirs(temporary)
             for pic in os.listdir(gallery_path):
                 full_pic=(os.path.join(gallery_path,pic)).replace('\\','/')
 
-                if full_pic not in prepare_all_pic():
+                if full_pic not in old_pic:
                     try:
                         shutil.copyfile(full_pic,os.path.join(temporary,pic))
                     except:
@@ -82,10 +103,10 @@ def gallery(project):
                     db.commit()
 
                     for tag in tags:
-                        if tag not in prepare_tag() and tag not in tag_data:
+                        if tag not in table_list :
                             try:
                                 cursor.execute("CREATE TABLE `%s` (FIRST_NAME  CHAR(200) NOT NULL )" % (tag))
-                                tag_data.append(tag)
+                                table_list.append(tag)
                             except:
                                 pass
 
@@ -115,16 +136,16 @@ def gallery(project):
     i=0
     for pic_path,tags in tag_sum.items():
         i+=1
-        if pic_path not in prepare_all_pic():
+        if pic_path not in old_pic:
             pic_path=pic_path.replace('\\','/')
             cursor.execute(f"INSERT INTO all_pic (FIRST_NAME) VALUES ('" + pic_path + "')")
             db.commit()
 
             for tag in tags:
-                if tag not in prepare_tag() and tag not in tag_data:
+                if tag not in table_list :
                     try:
                         cursor.execute("CREATE TABLE `%s` (FIRST_NAME  CHAR(200) NOT NULL )" % (tag))
-                        tag_data.append(tag)
+                        table_list.append(tag)
                     except:
                         pass
 
@@ -142,10 +163,8 @@ if __name__ == '__main__':
                          database='tag')  # 这里一定要改
     cursor = db.cursor()
 
-    prepare_gallery_on()
-
     project = input('请输入图库地址：')
-    demo = 'demoo'
+    demo = 'demoo'#自行选取模型
 
     gallery(project)
 
