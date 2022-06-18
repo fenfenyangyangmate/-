@@ -7,22 +7,25 @@ from color import *
 #By 魔王  （感兴趣可以加我qq：460452649）
 print('By 魔王  （感兴趣可以加我qq：460452649）')
 
+if os.path.isdir('data'):
+    pass
+else:
+    os.mkdir('data')
+
 aaa=[]
 bbb=[]
 ccc=[]
-def found(tags,times):
+def found(tags,times):#这部分废弃了，但因为是我第一次写的版本所以还是留下了
     cursor = db.cursor()
     sql = "show tables"
     cursor.execute(sql)
-    table = cursor.fetchall()
-    table_list = re.findall('(\'.*?\')', str(table))
-    table_list = [re.sub("'", '', each) for each in table_list]
+    table_list = [tuple[0] for tuple in cursor.fetchall()]
 
     if times=='':
         times=1
     # SQL 查询语句
-    tags =((tags.replace('(', '（')).replace(')', '）')).replace('/','$')
-    sql = f"SELECT * FROM {tags}"
+    # tags =((tags.replace('(', '（')).replace(')', '）')).replace('/','$')
+    sql = f"SELECT * FROM `{tags}`"
     try:
         # 执行SQL语句
         cursor.execute(sql)
@@ -31,8 +34,6 @@ def found(tags,times):
         for row in results:
             id = row[0]
             aaa.append(id)
-
-
     except:
         print("Error: unable to fetch data")
     if len(aaa)==0:
@@ -41,6 +42,8 @@ def found(tags,times):
         else:
             wu=f' {tags} 无该标签或标签输入不正确（参考tag.txt）'
         print(wu)
+        gg=[i for i in  table_list if tags in i]
+        print(gg)
         f1.write(f'{wu} \n')
         # f1.write('{}\n'.format('*' * 20))
         f1.close()
@@ -114,13 +117,19 @@ def found1(tag):
     cursor = db.cursor()
     sql = "show tables"
     cursor.execute(sql)
-    table = cursor.fetchall()
-    table_list = re.findall('(\'.*?\')', str(table))
-    table_list = [re.sub("'", '', each) for each in table_list]
+    table_list = [tuple[0] for tuple in cursor.fetchall()]
     for i in tag:
         if i not in table_list:
             ddd.append(i)
-            printRed(f'\n未发现标签 {i} \n')
+            printRed(f'\n未发现标签 {i} ,尝试根据下列模糊查询标签查询：\n')
+            gg = [tt for tt in table_list if i in tt]
+            oo = -1
+            for mohu in gg:
+                oo += 1
+                if oo % 3 == 0:
+                    print('\n')
+                print(mohu, end=' , ')
+            printRed(f'\n未发现标签 {i} ,尝试根据上列模糊查询标签查询：')
         else:
             pass
 
@@ -131,9 +140,9 @@ def found1(tag):
         times = 0
         for tags in tag:
             times += 1
-            tags = ((tags.replace('(', '（')).replace(')', '）')).replace('/', '$')
+            # tags = ((tags.replace('(', '（')).replace(')', '）')).replace('/', '$')
             try:
-                sql = f"SELECT * FROM {tags}"
+                sql = f"SELECT * FROM `{tags}`"
 
                 # 执行SQL语句
                 cursor.execute(sql)
@@ -183,13 +192,20 @@ def overlapping(tag,tt):
     cursor = db.cursor()
     sql = "show tables"
     cursor.execute(sql)
-    table = cursor.fetchall()
-    table_list = re.findall('(\'.*?\')', str(table))
-    table_list = [re.sub("'", '', each) for each in table_list]
+    table_list = [tuple[0] for tuple in cursor.fetchall()]
     for i in tag:
         if i not in table_list:
             ddd.append(i)
-            printRed(f'\n未发现标签 {i} \n')
+            printRed(f'\n未发现标签 {i} ,尝试根据下列模糊查询标签查询：\n')
+            gg=[tt for tt in table_list if i in tt]
+            oo=-1
+            for mohu in gg:
+                oo+=1
+                if oo % 3==0:
+                    print('\n')
+                print(mohu,end=' , ')
+            printRed(f'\n未发现标签 {i} ,尝试根据上列模糊查询标签查询：')
+
         else:
             pass
 
@@ -200,9 +216,9 @@ def overlapping(tag,tt):
         times=0
         for tags in tag:
             times+=1
-            tags = ((tags.replace('(', '（')).replace(')', '）')).replace('/', '$')
+            # tags = ((tags.replace('(', '（')).replace(')', '）')).replace('/', '$')
             try:
-                sql = f"SELECT * FROM {tags}"
+                sql = f"SELECT * FROM `{tags}`"
 
                 # 执行SQL语句
                 cursor.execute(sql)
@@ -272,36 +288,35 @@ if __name__ == '__main__':
         ccc=input('请选择模式，回车默认打开图片，任意输入只查询（查询结果在data/temporary.txt)：')
         if ccc != '':
             bbbb=[]
-            while len(number) != 0:
-                db = pymysql.connect(host='localhost',
-                                     user='root',
-                                     password='123456',
-                                     database='tag')      #这里一定要改
-                with open('data/temporary.txt', 'a', encoding='utf-8')as f1:
-                    f1.write('{}\n'.format('*' * 20))
-                    f1.write("{}\n".format(time.ctime()))
-                    f1.write('--查询模式--\n')
-                    f1.write('查询标签：\n\n')
-                    print('♾' * 30)
-                    print('回车输入多个标签--交叉搜索，空白回车返回上一级')
-                    ts = 1
-                    while ts != 3:
-                        t = input('请输入关键词：')
-                        if t != '':
-                            if t not in bbbb:
-                                bbbb.append(t)
-                                f1.write(f'{t}\n')
-                            else:
-                                printYellow(f'\n标签 {t} 已输入，请勿重复输入！\n\n')
+            db = pymysql.connect(host='localhost',
+                                 user='root',
+                                 password='123456',
+                                 database='tag')      #这里一定要改
+            with open('data/temporary.txt', 'a', encoding='utf-8')as f1:
+                f1.write('{}\n'.format('*' * 20))
+                f1.write("{}\n".format(time.ctime()))
+                f1.write('--查询模式--\n')
+                f1.write('查询标签：\n\n')
+                print('♾' * 30)
+                print('回车输入多个标签--交叉搜索，空白回车返回上一级')
+                ts = 1
+                while ts != 3:
+                    t = input('请输入关键词：')
+                    if t != '':
+                        if t not in bbbb:
+                            bbbb.append(t)
+                            f1.write(f'{t}\n')
                         else:
-                            if len(bbbb) == 0:
-                                printYellow('\n第一次不能输入空值，请重新输入！\n\n')
-                                ts = 3
-                            else:
-                                found1(bbbb)
-                                print('\n查询结束\n')
-                                print('♾' * 30)
-                                ts = 3
+                            printYellow(f'\n标签 {t} 已输入，请勿重复输入！\n\n')
+                    else:
+                        if len(bbbb) == 0:
+                            printYellow('\n第一次不能输入空值，请重新输入！\n\n')
+                            ts = 3
+                        else:
+                            found1(bbbb)
+                            print('\n查询结束\n')
+                            print('♾' * 30)
+                            ts = 3
 
         else:
             bbbb=[]
@@ -329,7 +344,6 @@ if __name__ == '__main__':
                         if len(bbbb) == 0:
                             printYellow('\n第一次不能输入空值，请重新输入！\n\n')
                             ts=3
-
                         else:
                             tt=input('显示数量（回车默认1）：')
                             if tt =='':
@@ -337,34 +351,9 @@ if __name__ == '__main__':
                             try:
                                 int(tt)
                             except:
-
                                 printYellow(u'\n数量输入错误，请输入数字！\n\n')
                                 break
                             overlapping(bbbb, tt)
                             print('\n查询结束\n')
                             print('♾' * 30)
                             ts=3
-                            # bbbb.clear()
-    #     while len(number) != 0:
-    #         db = pymysql.connect(host='localhost',
-    #                              user='root',
-    #                              password='123456',
-    #                              database='tag')    #这里一定要改
-    #         with open('data/temporary.txt', 'a', encoding='utf-8')as f1:
-    #             f1.write('{}\n'.format('*' * 20))
-    #             f1.write("{}\n".format(time.ctime()))
-    #             print('🔍' * 30)
-    #             t = input('请输入关键词（回车结束）：')
-    #             b=input('显示数量（默认1）：')
-    #             try:
-    #             # ccccc=int(b)/100
-    #                 f1.write(f'查询标签 : {t} \n')
-    #
-    #                 if t == '':
-    #                     number.clear()
-    #                 else:
-    #                     number.append(t)
-    #                     found(t, b)
-    #             except:
-    #                 print('出错了！！！,图片移动了或数量不符合格式')
-
