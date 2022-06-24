@@ -1,15 +1,11 @@
-import re
-import sys
 from picture_compression import *
 import os
 import time
-import  shutil
 import pymysql
 from color import *
 from deepdanbooru import commands
-from multiprocessing.dummy import Pool as ThreadPool
-from tqdm import tqdm
 import threading
+from multiprocessing.dummy import Pool as ThreadPool
 #By 魔王  （感兴趣可以加我qq：460452649）
 print('By 魔王  （感兴趣可以加我qq：460452649）')
 print('PS: 不能用 temporary 的图库')
@@ -44,6 +40,7 @@ def insert(old_pic,table_list,tag_sum):
         sys.stdout.write('\r进度 : {:.2%}  当前项目： {}  已导入：{}'.format(i / len(tag_sum), pic_path.replace('/temporary', ''), i))
 
 def gallery(project):
+    global temporary
     #获取导入过的图库
     sql = f"select * from gallery_on"
     cursor.execute(sql)
@@ -119,6 +116,7 @@ def gallery(project):
                 tag_sum.update(tag_sum1)#识别后的标签
                 t1 = threading.Thread(target=insert(old_pic,table_list,tag_sum1))
                 t1.start()
+        os.removedirs(temporary)
 
         gallery_path = gallery_path.replace('\\', '/')
         if gallery_path not in old_gallery:
@@ -128,43 +126,6 @@ def gallery(project):
                 db.commit()
             except:
                 pass
-
-    # for gal in os.listdir(project):
-    #     fi += 1
-    #     gallery_path = (os.path.join(project, gal)).replace('\\', '/')
-    #     if gallery_path  not in old_gallery:
-    #         try:
-    #             sql = f"INSERT INTO gallery_on (gallery) VALUES ('" + gallery_path + "')"  # sql插识别过的图库入
-    #             cursor.execute(sql)
-    #             db.commit()
-    #         except:
-    #             pass
-
-    # def writing(pic_path,tags):
-    # def insert():
-    #     i=0
-    #     for pic_path,tags in tag_sum.items():
-    #         i+=1
-    #         if pic_path not in old_pic:
-    #             pic_path=pic_path.replace('\\','/')
-    #             sql=f"INSERT INTO all_pic (FIRST_NAME) VALUES ('" + pic_path + "')"
-    #             cursor.execute(sql)
-    #             db.commit()
-    #
-    #             for tag in tags:
-    #                 if tag not in table_list :
-    #                     try:
-    #                         cursor.execute("CREATE TABLE `%s` (FIRST_NAME  CHAR(200) NOT NULL )" % (tag))
-    #                         table_list.append(tag)
-    #                     except:
-    #                         pass
-    #
-    #                 sql = f"INSERT INTO `{tag}` (FIRST_NAME) VALUES ('" + pic_path.replace('/temporary','') + "')"
-    #                 cursor.execute(sql)
-    #                 db.commit()
-    #         sys.stdout.write('\r进度 : {:.2%}  当前项目： {}  已导入：{}'.format(i / len(tag_sum), pic_path, i))
-            # for pic , tags in
-
     # try:
     #
     #     pool = ThreadPool()

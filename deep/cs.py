@@ -1,28 +1,25 @@
-import threading
-import time
+import pymysql
 
+db = pymysql.connect(host='localhost',
+                             user='root',
+                             password='123456',
+                             database='tag')  # 这里一定要改+
+cursor = db.cursor()
+sql1 = "select * from all_pic"
+cursor.execute(sql1)
+table_list1 = [tuple[0] for tuple in cursor.fetchall()]
+sql2 = "show tables"
+cursor.execute(sql2)
+table_list2 = [tuple[0] for tuple in cursor.fetchall()]
 
-def load_redis_white_userId():
-    print(2**100)
+for pic in table_list1:
+    for tag in table_list2:
+        sql3 = "select * from "
 
+sql1 = "delete from 1girl where FIRST_NAME = 'F:/Grabber/1ssakawaguchi/5058178.png'"
+print(sql1)
+a=cursor.execute(sql1)
+db.commit()
 
-
-def update_redis_white_userId():
-    """
-    :return: 每一分钟跟新一次用户白名单
-    """
-    t1 = threading.Thread(target=load_redis_white_userId)
-    t1.start()
-def asd():
-    for i in range(4):
-        if i % 2 == 0:
-            update_redis_white_userId()
-            time.sleep(1)
-        print(1)
-
-for i in range(4):
-    asd()
-#
-# if __name__ == '__main__':
-#     # 开启线程启动用户白名单
-#     update_redis_white_userId()
+if 'F:/Grabber/1ssakawaguchi/5058178.png' in table_list1:
+    print(21)

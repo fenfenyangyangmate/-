@@ -6,7 +6,7 @@ db = pymysql.connect(host='localhost',
                          password='123456',
                          database='tag')  # 这里一定要改
 cursor = db.cursor()
-cursor.execute("CREATE TABLE gallery (gallery  CHAR(200) NOT NULL )")
+cursor.execute("CREATE TABLE gallery_on (gallery  CHAR(200) NOT NULL )")
 db.commit()
 
 cursor.execute("CREATE TABLE all_pic (FIRST_NAME  CHAR(200) NOT NULL )")
